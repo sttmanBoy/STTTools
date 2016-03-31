@@ -42,10 +42,7 @@ singleton_m(STTNetworking);
     } else if ([parameter isKindOfClass:[NSDictionary class]]) {
         URLString = [URLString stringByAppendingString:[NSString stringWithFormat:@"?%@",[networking enumerateKeysAndObjectsSplicedIntoTheParameters:parameter]]];
     } else {
-#if TARGET_IPHONE_SIMULATOR
-        NSLog(@"Unrecognized parameters");
-#elif TARGET_OS_IPHONE
-#endif
+        NSParameterAssert(parameter);
     }
     [networking POST:URLString parametersBody:dataBody success:success failure:failure];
 }
