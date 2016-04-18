@@ -61,6 +61,10 @@ NSString *GetDocumentPathWithFile(NSString *file);
 // 临时文件, 在数据用完后就马上清空 (比如压缩包)
 NSString *GetTemporaryPathWithFile(NSString *file);
 
+//手机号码验证 MODIFIED BY HELENSONG
+BOOL validateMobile(NSString* mobile);
 
+//车牌号验证 MODIFIED BY HELENSONG
+BOOL validateCarNo(NSString* carNo);
 void CreatePlistForDictionary(id structure, NSString *savePath);
 @end

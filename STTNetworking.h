@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "Singleton.h"
+#import "STTTool.h"
 @interface STTNetworking : NSObject
 
 singleton_h(STTNetworking);
@@ -19,17 +20,19 @@ singleton_h(STTNetworking);
  *  @param success   Successful block
  *  @param failure  Failed block
  */
-+ (void)POST:(NSString *)URLString parametersBody:(NSData *)dataBody success:(void (^)(NSURLResponse *response, id responseObject))success failure:(void (^)(NSURLResponse *response, NSError *error))failure;
+- (void)POST:(NSString *)URLString parametersBody:(NSData *)dataBody success:(void (^)(NSURLResponse *response, id responseObject))success failure:(void (^)(NSURLResponse *response, NSError *error))failure;
 /**
- *  post request, you can set the body but without any arguments, add paramenters
- *
- *  @param URLString  url request
- *  @param dataBody   url request
- *  @param parameter  url parameter
- *  @param success    Successful block
- *  @param failure   Failed block
+ *  File Upload
+ *  @param Url file upload url
+ *  @param Name specified parameter name (must be consistent with the server-side)
+ *  @param Filename filename
+ *  @param MimeType file format
+ *  @param Data file data
+ *  @param Params parameter added
+ *  @param Success success callback
+ *  @param Failure callback failed
  */
-+ (void)POST:(NSString *)URLString parametersBody:(NSData *)dataBody parameters:(id)parameter success:(void (^)(NSURLResponse *response, id responseObject))success failure:(void (^)(NSURLResponse *response, NSError *error))failure;
+- (void)upload:(NSString *)url name:(NSString *)name filename:(NSString *)filename mimeType:(NSString *)mimeType data:(NSData *)data parmas:(NSDictionary *)params success:(void (^)(NSURLResponse *response, id responseObject))success failure:(void (^)(NSURLResponse *response, NSError *error))failure;
 /**
  *  The dictionary spliced into the parameters
  *
@@ -38,4 +41,10 @@ singleton_h(STTNetworking);
  *  @return parameters string
  */
 + (NSString *)enumerateKeysAndObjectsSplicedIntoTheParameters:(NSDictionary *)dict;
+
+/// dict with key
++ (NSArray *)keyEnumeratorWith:(NSDictionary *)dict;
+
+/// dict with objcet
++ (NSArray *)objectEnumeratorWith:(NSDictionary *)dict;
 @end

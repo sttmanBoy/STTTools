@@ -8,6 +8,7 @@
 
 #import "STTTool.h"
 #import <CommonCrypto/CommonDigest.h>
+#import "KeyChainStore.h"
 
 @implementation STTTool
 /**
@@ -59,12 +60,21 @@
  */
 + (NSString *)getUUID
 {
-    CFUUIDRef puuid = CFUUIDCreate(nil);
-    CFStringRef uuidString = CFUUIDCreateString(nil, puuid);
-    NSString *result = (NSString *)CFBridgingRelease(CFStringCreateCopy(NULL, uuidString));
-    CFRelease(puuid);
-    CFRelease(uuidString);
-    return result;
+    NSString * strUUID = (NSString *)[KeyChainStore load:@"com.company.app.usernamepassword"];
+    
+    //首次执行该方法时，uuid为空
+    if ([strUUID isEqualToString:@""] || !strUUID)
+    {
+        //生成一个uuid的方法
+        CFUUIDRef uuidRef = CFUUIDCreate(kCFAllocatorDefault);
+        
+        strUUID = (NSString *)CFBridgingRelease(CFUUIDCreateString (kCFAllocatorDefault,uuidRef));
+        
+        //将该uuid保存到keychain
+        [KeyChainStore save:KEY_USERNAME_PASSWORD data:strUUID];
+        
+    }
+    return strUUID;
 }
 
 /**
@@ -117,7 +127,7 @@
 NSString *GetCachesPathWithFile(NSString *file)
 {
     NSString *cachesPath = [NSSearchPathForDirectoriesInDomains
-                            (NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+                            (NSCachesDirectory, NSUserDomainMask, YES) lastObject];
     if (file) {
         return [cachesPath stringByAppendingPathComponent:file];
     }
@@ -128,7 +138,7 @@ NSString *GetCachesPathWithFile(NSString *file)
 NSString *GetDocumentPathWithFile(NSString *file)
 {
     NSString *cachesPath = [NSSearchPathForDirectoriesInDomains
-                            (NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+                            (NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
     if (file) {
         return [cachesPath stringByAppendingPathComponent:file];
     }
@@ -163,6 +173,24 @@ void CreatePlistForDictionary(id structure, NSString *savePath)
     }
 }
 
+/*手机号码验证 MODIFIED BY HELENSONG*/
+BOOL validateMobile(NSString* mobile)
+{
+    //手机号以13， 15，18开头，八个 \d 数字字符
+    NSString *phoneRegex = @"^((13[0-9])|(15[^4,\\D])|(18[0,0-9]))\\d{8}$";
+    NSPredicate *phoneTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@",phoneRegex];
+    NSLog(@"phoneTest is %@",phoneTest);
+    return [phoneTest evaluateWithObject:mobile];
+}
+
+/**车牌号验证 MODIFIED BY HELENSONG*/
+BOOL validateCarNo(NSString* carNo)
+{
+    NSString *carRegex = @"^[A-Za-z]{1}[A-Za-z_0-9]{5}$";
+    NSPredicate *carTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@",carRegex];
+    NSLog(@"carTest is %@",carTest);
+    return [carTest evaluateWithObject:carNo];
+}
 //Unicode转UTF-8
 
 + (NSString *)encodeToPercentEscapeString:(NSString *)input
